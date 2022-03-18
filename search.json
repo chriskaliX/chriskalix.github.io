@@ -10,10 +10,10 @@
     } ,
   
     {
-      "title"    : "Headers Test",
-      "description" : "",
+      "title"    : "Jejkyll Headers",
+      "description" : "This is page to test jekyll headers",
       "category" : "",
-      "tags"     : "",
+      "tags"     : "headers, jekyll, css",
       "url"      : "/Gesko/2022/03/01/headers-test",
       "date"     : "2022-03-01 00:00:00 +0100"
     } 
