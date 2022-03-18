@@ -3,7 +3,7 @@
     "title": "chriskali's blog",
     "home_page_url": "https://chriskalix.github.com/Gesko/",
     "feed_url": "https://chriskalix.github.com/Gesko/feed.json",
-    "description": "Security engineer. \nWorking on eBPF, Host Intrusion Detection System, WAF, and some Java Sec.\nLanguage: golang\nProjects:\n\n  [Hades](https://github.com/chriskaliX/Hades)",
+    "description": "Security engineer.  Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec. Language: golang Projects:\n  [Hades](https://github.com/chriskaliX/Hades)",
     "icon": "https://chriskalix.github.com/Gesko/apple-touch-icon.png",
     "favicon": "https://chriskalix.github.com/Gesko/favicon.ico",
     "expired": false,
