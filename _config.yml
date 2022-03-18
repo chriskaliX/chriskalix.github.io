@@ -1,28 +1,32 @@
 site: Gesko
-title: Gesko
-greetings: Hi 👋
+title: chriskali's blog
+greetings: chriskali
 description: >-
-  just a minimalist, personal blog
+  Security engineer. Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec.
+  Language: golang
+  Projects:
+    [Hades](https://github.com/chriskaliX/Hades)
+  
 lang: en-US
 timezone:  Europe/Rome
-repo: https://github.com/p0wex/Gesko # site repo [optional]
-data-theme: dark # default theme "dark" | "light"
+repo: https://chriskalix.github.com # site repo [optional]
+data-theme: light # default theme "dark" | "light"
 discus-identifier: powex # replace with your disqus shortname
 
 author:
   name: gesko
   bio: just a minimalist, personal blog
   userpicture: 
-  username: # general username
-  github: # github username
+  username: chriskali
+  github: chriskaliX
   twitter: # twitter username
-  email: your-email@email.com # email adress
+  email: chriskali@163.com # email adress
 
 # Font Settings
 googlewebfonts: family=Play:wght@400;700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,500;1,600;1,700;1,900
 
 # URL settings
-url: "https://p0wex.github.io" # Domain Name of host. [username].github.io for github pages
+url: "https://chriskalix.github.com" # Domain Name of host. [username].github.io for github pages
 baseurl: "/Gesko" # sub folder for jekyll site. only if jekyll site not in root of host. leave blank if not wishd. always add / in front.
 permalink: pretty
 
