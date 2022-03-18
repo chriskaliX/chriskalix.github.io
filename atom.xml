@@ -4,7 +4,7 @@
  <title>chriskali's blog</title>
  <link href="https://chriskalix.github.com/Gesko/atom.xml" rel="self"/>
  <link href="https://chriskalix.github.com/Gesko/"/>
- <updated>2022-03-18T18:39:32+01:00</updated>
+ <updated>2022-03-18T18:45:31+01:00</updated>
  <id>https://chriskalix.github.com</id>
  <author>
    <name>gesko</name>
@@ -20,6 +20,15 @@
    <content type="html">&lt;h1 id=&quot;规划&quot;&gt;规划&lt;/h1&gt;
 
 &lt;p&gt;后续长期做的方向，应该还是 HIDS/WAF 反入侵相关。当然也会涉及 Java/Golang 的一些安全开发，这里将记录我的一切~&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Headers Test</title>
+   <link href="https://chriskalix.github.com/Gesko/2022/03/01/headers-test"/>
+   <updated>2022-03-01T00:00:00+01:00</updated>
+   <id>https://chriskalix.github.com/2022/03/01/headers-test</id>
+   <content type="html">
 </content>
  </entry>
  
