@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-03-19T11:57:22+01:00</updated>
+ <updated>2022-03-19T12:03:02+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -39,14 +39,7 @@
 
 &lt;p&gt;为了方便理解，借用一个图(这图很经典，方便了解整个流程)：&lt;/p&gt;
 
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;![](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip&lt;/td&gt;
-      &lt;td&gt;imageView2/2/format/webp)&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;&lt;img src=&quot;https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;in-linux&quot;&gt;in Linux&lt;/h4&gt;
 
