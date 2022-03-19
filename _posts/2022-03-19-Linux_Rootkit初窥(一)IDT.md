@@ -27,7 +27,7 @@ minute: 1
 
 为了方便理解，借用一个图(这图很经典，方便了解整个流程)：
 
-![](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip)
+![简书](https://chriskaliX.github.io/assets/imgs/callgraph.jpg)
 
 #### in Linux
 
@@ -84,7 +84,7 @@ void idt_substitute(void)
 
 顺便贴一张 IDTR
 
-![](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&refer=http%3A%2F%2Fimg.it610.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1650278847&t=cec7d575642e0f888777f63f0507bee7)
+![百度](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&refer=http%3A%2F%2Fimg.it610.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1650278847&t=cec7d575642e0f888777f63f0507bee7)
 
 在字节的 `anti_rootkit` 中我们截取 `interrupt` 检查部分，事实上 `sys_call_table` 的检查部分也是一样的
 
