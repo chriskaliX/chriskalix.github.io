@@ -2,9 +2,9 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>chriskali's blog</title>
- <link href="https://chriskalix.github.com/Gesko/atom.xml" rel="self"/>
- <link href="https://chriskalix.github.com/Gesko/"/>
- <updated>2022-03-19T03:53:30+01:00</updated>
+ <link href="https://chriskalix.github.com/atom.xml" rel="self"/>
+ <link href="https://chriskalix.github.com/"/>
+ <updated>2022-03-19T03:54:56+01:00</updated>
  <id>https://chriskalix.github.com</id>
  <author>
    <name>gesko</name>
@@ -14,7 +14,7 @@
  
  <entry>
    <title>从头开始的博客</title>
-   <link href="https://chriskalix.github.com/Gesko/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2"/>
+   <link href="https://chriskalix.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2"/>
    <updated>2022-03-19T00:00:00+01:00</updated>
    <id>https://chriskalix.github.com/2022/03/19/从头开始的博客</id>
    <content type="html">&lt;h1 id=&quot;规划&quot;&gt;规划&lt;/h1&gt;
