@@ -27,7 +27,7 @@ minute: 1
 
 为了方便理解，借用一个图(这图很经典，方便了解整个流程)：
 
-![](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip|imageView2/2/format/webp)
+![](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip)
 
 #### in Linux
 
