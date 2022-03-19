@@ -1,4 +1,4 @@
-site: Gesko
+site: chriskali
 title: chriskali's blog
 greetings: chriskali
 description: >-
@@ -15,7 +15,7 @@ data-theme: light # default theme "dark" | "light"
 discus-identifier: powex # replace with your disqus shortname
 
 author:
-  name: gesko
+  name: chriskali
   bio: just a minimalist, personal blog
   userpicture: https://avatars.githubusercontent.com/u/46471110?s=100
   username: chriskali
@@ -28,7 +28,7 @@ googlewebfonts: family=Play:wght@400;700&family=Source+Code+Pro:ital,wght@0,200;
 
 # URL settings
 url: "https://chriskalix.github.com" # Domain Name of host. [username].github.io for github pages
-baseurl: "/Gesko" # sub folder for jekyll site. only if jekyll site not in root of host. leave blank if not wishd. always add / in front.
+baseurl: "/" # sub folder for jekyll site. only if jekyll site not in root of host. leave blank if not wishd. always add / in front.
 permalink: pretty
 
 # local
