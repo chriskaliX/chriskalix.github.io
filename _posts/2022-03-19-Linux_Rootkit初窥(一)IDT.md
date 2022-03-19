@@ -25,9 +25,9 @@ minute: 1
 
 其中 Interrupt Gate Descriptor 用于中断的处理，需要关注的是 DPL（Descriptor Privilege Level）为0，因此用户态不能访问中断门
 
-为了方便理解，借用一个图：
+为了方便理解，借用一个图(这图很经典，方便了解整个流程)：
 
-![程序调用](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+![](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip|imageView2/2/format/webp)
 
 #### in Linux
 
