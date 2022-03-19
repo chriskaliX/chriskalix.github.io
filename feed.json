@@ -1,15 +1,15 @@
 {
     "version": "https://jsonfeed.org/version/1",
     "title": "chriskali's blog",
-    "home_page_url": "https://chriskalix.github.com/Gesko/",
-    "feed_url": "https://chriskalix.github.com/Gesko/feed.json",
+    "home_page_url": "https://chriskalix.github.com/",
+    "feed_url": "https://chriskalix.github.com/feed.json",
     "description": "Security engineer.  Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec. Language: golang Projects:\n  [Hades](https://github.com/chriskaliX/Hades)",
-    "icon": "https://chriskalix.github.com/Gesko/apple-touch-icon.png",
-    "favicon": "https://chriskalix.github.com/Gesko/favicon.ico",
+    "icon": "https://chriskalix.github.com/apple-touch-icon.png",
+    "favicon": "https://chriskalix.github.com/favicon.ico",
     "expired": false,
     
     "author":  {
-        "name": "gesko",
+        "name": "chriskali",
         "url": null,
         "avatar": null
     },
@@ -17,12 +17,12 @@
 "items": [
     
         {
-            "id": "https://chriskalix.github.com/Gesko/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
+            "id": "https://chriskalix.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
             "title": "从头开始的博客",
             "summary": "Gridea 用的不习惯",
             "content_text": "规划后续长期做的方向，应该还是 HIDS/WAF 反入侵相关。当然也会涉及 Java/Golang 的一些安全开发，这里将记录我的一切~",
             "content_html": "<h1 id=\"规划\">规划</h1><p>后续长期做的方向，应该还是 HIDS/WAF 反入侵相关。当然也会涉及 Java/Golang 的一些安全开发，这里将记录我的一切~</p>",
-            "url": "https://chriskalix.github.com/Gesko/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
+            "url": "https://chriskalix.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
             
             
             
@@ -32,31 +32,7 @@
             "date_modified": "2022-03-19T00:00:00+01:00",
             
                 "author":  {
-                "name": "gesko",
-                "url": null,
-                "avatar": null
-                }
-                
-            
-        },
-    
-        {
-            "id": "https://chriskalix.github.com/Gesko/2022/03/01/headers-test",
-            "title": "Jejkyll Headers",
-            "summary": "This is page to test jekyll headers",
-            "content_text": "Headers TestThis page tests jekyll headersHeader 1This largest headerHeader 2This 2nd largest headerHeader 3This third largest headerHeader 4This medium headerHeader 5This 2nd smallest headerHeader 6This smallest header",
-            "content_html": "<h1 id=\"headers-test\">Headers Test</h1><p>This page tests jekyll headers</p><h1 id=\"header-1\">Header 1</h1><p>This largest header</p><h2 id=\"header-2\">Header 2</h2><p>This 2nd largest header</p><h3 id=\"header-3\">Header 3</h3><p>This third largest header</p><h4 id=\"header-4\">Header 4</h4><p>This medium header</p><h5 id=\"header-5\">Header 5</h5><p>This 2nd smallest header</p><h6 id=\"header-6\">Header 6</h6><p>This smallest header</p>",
-            "url": "https://chriskalix.github.com/Gesko/2022/03/01/headers-test",
-            
-            
-            
-            "tags": ["headers","jekyll","css"],
-            
-            "date_published": "2022-03-01T00:00:00+01:00",
-            "date_modified": "2022-03-01T00:00:00+01:00",
-            
-                "author":  {
-                "name": "gesko",
+                "name": "chriskali",
                 "url": null,
                 "avatar": null
                 }
