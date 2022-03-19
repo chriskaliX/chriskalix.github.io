@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-03-19T12:03:02+01:00</updated>
+ <updated>2022-03-19T12:07:15+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -39,7 +39,7 @@
 
 &lt;p&gt;为了方便理解，借用一个图(这图很经典，方便了解整个流程)：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/callgraph.jpg&quot; alt=&quot;简书&quot; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;in-linux&quot;&gt;in Linux&lt;/h4&gt;
 
@@ -93,7 +93,7 @@
 
 &lt;p&gt;顺便贴一张 IDTR&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&amp;amp;refer=http%3A%2F%2Fimg.it610.com&amp;amp;app=2002&amp;amp;size=f9999,10000&amp;amp;q=a80&amp;amp;n=0&amp;amp;g=0n&amp;amp;fmt=auto?sec=1650278847&amp;amp;t=cec7d575642e0f888777f63f0507bee7&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&amp;amp;refer=http%3A%2F%2Fimg.it610.com&amp;amp;app=2002&amp;amp;size=f9999,10000&amp;amp;q=a80&amp;amp;n=0&amp;amp;g=0n&amp;amp;fmt=auto?sec=1650278847&amp;amp;t=cec7d575642e0f888777f63f0507bee7&quot; alt=&quot;百度&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;在字节的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;anti_rootkit&lt;/code&gt; 中我们截取 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;interrupt&lt;/code&gt; 检查部分，事实上 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys_call_table&lt;/code&gt; 的检查部分也是一样的&lt;/p&gt;
 
