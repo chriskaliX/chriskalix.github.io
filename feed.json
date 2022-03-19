@@ -1,11 +1,11 @@
 {
     "version": "https://jsonfeed.org/version/1",
-    "title": "chriskali's blog",
-    "home_page_url": "https://chriskalix.github.com/",
-    "feed_url": "https://chriskalix.github.com/feed.json",
+    "title": "chriskali",
+    "home_page_url": "chriskaliX.github.com/",
+    "feed_url": "chriskaliX.github.com/feed.json",
     "description": "Security engineer. Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec. Language: golang",
-    "icon": "https://chriskalix.github.com/apple-touch-icon.png",
-    "favicon": "https://chriskalix.github.com/favicon.ico",
+    "icon": "chriskaliX.github.com/apple-touch-icon.png",
+    "favicon": "chriskaliX.github.com/favicon.ico",
     "expired": false,
     
     "author":  {
@@ -17,12 +17,12 @@
 "items": [
     
         {
-            "id": "https://chriskalix.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
+            "id": "chriskaliX.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
             "title": "从头开始的博客",
             "summary": "Gridea 用的不习惯",
             "content_text": "规划后续长期做的方向，应该还是 HIDS/WAF 反入侵相关。当然也会涉及 Java/Golang 的一些安全开发，这里将记录我的一切~",
             "content_html": "<h1 id=\"规划\">规划</h1><p>后续长期做的方向，应该还是 HIDS/WAF 反入侵相关。当然也会涉及 Java/Golang 的一些安全开发，这里将记录我的一切~</p>",
-            "url": "https://chriskalix.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
+            "url": "chriskaliX.github.com/2022/03/19/%E4%BB%8E%E5%A4%B4%E5%BC%80%E5%A7%8B%E7%9A%84%E5%8D%9A%E5%AE%A2",
             
             
             
