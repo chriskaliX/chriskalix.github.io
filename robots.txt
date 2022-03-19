@@ -1,2 +1,2 @@
 User-agent: *
-Sitemap: chriskaliX.github.io/sitemap.xml
+Sitemap: https://chriskaliX.github.io/sitemap.xml
