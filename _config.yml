@@ -2,8 +2,8 @@ site: chriskali
 title: chriskali
 greetings: chriskali
 description: >-
-  Security engineer.
-  Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec.
+  Security engineer.<bd>
+  Working on eBPF, Host Intrusion Detection System, WAF, and some Java Security.<br>
   Language: golang
   
 lang: zh-CN
@@ -34,7 +34,6 @@ markdown: kramdown
 kramdown:
   input: GFM
   syntax_highlighter: rouge
-
 
 exclude:
   - .jekyll-cache
