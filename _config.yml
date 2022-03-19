@@ -8,7 +8,7 @@ description: >-
   Projects:
     [Hades](https://github.com/chriskaliX/Hades)
   
-lang: en-US
+lang: zh-CN
 timezone:  Europe/Rome
 repo: https://chriskalix.github.com # site repo [optional]
 data-theme: light # default theme "dark" | "light"
@@ -17,7 +17,7 @@ discus-identifier: powex # replace with your disqus shortname
 author:
   name: gesko
   bio: just a minimalist, personal blog
-  userpicture: 
+  userpicture: https://avatars.githubusercontent.com/u/46471110?s=100
   username: chriskali
   github: chriskaliX
   twitter: # twitter username
