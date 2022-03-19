@@ -8,7 +8,7 @@ description: >-
   
 lang: zh-CN
 timezone:  Europe/Rome
-repo: https://github.com/chriskaliX/chriskaliX.github.io # site repo [optional]
+repo: chriskaliX.github.io # site repo [optional]
 data-theme: light # default theme "dark" | "light"
 discus-identifier: powex # replace with your disqus shortname
 
