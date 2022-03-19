@@ -21,7 +21,16 @@ minute: 1
 
 中断分为可屏蔽和不可屏蔽中断，其中不可屏蔽中断在这里不讨论。中断向量是个0~255之间的数，其中 0~31 是 exceptions 以及不可屏蔽中断， 32~47 是可屏蔽中断，48~255 为软件中断。Linux 下通常使用的是 (0x80) sys_call_table，即用户态通过 syscall 调用到内核函数。同样的，当我们为了获取 `sys_call_table` 地址也可以从 `IDT` 中获取
 
-什么是 `IDT` ?  `IDT` 即 Interrupt Descriptor Table。是一个描述中断即其对应处理函数的线性表，包含三种不同类型的描述/类型。分别是 Task Gate Descriptor（Linux 不使用这种） / Interrupt Gate Descriptor / Trap Gate Descriptor
+什么是 `IDT` ?  `IDT` 即 Interrupt Descriptor Table。是一个描述中断即其对应处理函数的线性表，包含四种不同类型的描述/类型。分别是 Task Gate Descriptor（Linux 不使用这种） / Interrupt Gate Descriptor / Trap Gate Descriptor / Call Gate Descriptor
+
+```c
+enum {
+    GATE_INTERRUPT = 0xE,
+    GATE_TRAP = 0xF,
+    GATE_CALL = 0xC,
+    GATE_TASK = 0x5,
+};
+```
 
 其中 Interrupt Gate Descriptor 用于中断的处理，需要关注的是 DPL（Descriptor Privilege Level）为0，因此用户态不能访问中断门
 
@@ -52,9 +61,11 @@ struct gate_struct {
 } __attribute__((packed));
 ```
 
+其中 offset_* 代表中断函数的偏移量，bits 为属性符
+
 ### 从项目出发
 
-从开始，我们便以字节的 Elkeid 作为参考。Elkeid 主要检查了 4 个，即隐藏内核模块/进程隐藏/IDT劫持/系统调用劫持。我们以 idt rootkit 为关键字，搜索到一些[项目](https://github.com/kaneschutzman/linux-rootkit)。在 [idt.c](https://github.com/kaneschutzman/linux-rootkit/blob/5dcb228a86f67773d6e2b92276e59cf030b52c23/src/idt.c) 中，通过替换 `IDT` 地址实现 Hook，关键代码如下：
+从开始，我们便以字节的 Elkeid 作为参考。Elkeid 主要检查了 4 个，即隐藏内核模块/进程隐藏/IDT劫持/系统调用劫持。我们以 idt rootkit 为关键字，搜索到一些[项目](https://github.com/kaneschutzman/linux-rootkit)。在 [idt.c](https://github.com/kaneschutzman/linux-rootkit/blob/5dcb228a86f67773d6e2b92276e59cf030b52c23/src/idt.c) 中，通过替换 `IDT` 中的函数地址实现 Hook，关键代码如下：
 
 ```c
 void idt_set_entry(unsigned long addr, int n)
