@@ -1,4 +1,4 @@
-site: chriskali
+site: Gesko
 title: chriskali's blog
 greetings: chriskali
 description: >-
@@ -15,7 +15,7 @@ data-theme: light # default theme "dark" | "light"
 discus-identifier: powex # replace with your disqus shortname
 
 author:
-  name: chriskali
+  name: gesko
   bio: just a minimalist, personal blog
   userpicture: https://avatars.githubusercontent.com/u/46471110?s=100
   username: chriskali
@@ -94,5 +94,3 @@ defaults:
 relative_links:
   enabled:     true
   collections: false
-
-
