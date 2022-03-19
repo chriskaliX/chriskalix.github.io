@@ -3,13 +3,13 @@
     "title": "chriskali's blog",
     "home_page_url": "https://chriskalix.github.com/",
     "feed_url": "https://chriskalix.github.com/feed.json",
-    "description": "Security engineer.  Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec. Language: golang Projects:\n  [Hades](https://github.com/chriskaliX/Hades)",
+    "description": "Security engineer. Working on eBPF, Host Intrusion Detection System, WAF, and some Java Sec. Language: golang",
     "icon": "https://chriskalix.github.com/apple-touch-icon.png",
     "favicon": "https://chriskalix.github.com/favicon.ico",
     "expired": false,
     
     "author":  {
-        "name": "gesko",
+        "name": "chriskali",
         "url": null,
         "avatar": null
     },
@@ -32,7 +32,7 @@
             "date_modified": "2022-03-19T00:00:00+01:00",
             
                 "author":  {
-                "name": "gesko",
+                "name": "chriskali",
                 "url": null,
                 "avatar": null
                 }
