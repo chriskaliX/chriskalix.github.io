@@ -2,7 +2,7 @@ site: chriskali
 title: chriskali
 greetings: chriskali
 description: >-
-  Security engineer.<bd>
+  Security engineer.<br>
   Working on eBPF, Host Intrusion Detection System, WAF, and some Java Security.<br>
   Language: golang
   
