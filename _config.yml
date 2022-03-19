@@ -1,5 +1,5 @@
-site: Gesko
-title: chriskali's blog
+site: chriskali
+title: chriskali
 greetings: chriskali
 description: >-
   Security engineer.
@@ -8,7 +8,7 @@ description: >-
   
 lang: zh-CN
 timezone:  Europe/Rome
-repo: https://chriskalix.github.com # site repo [optional]
+repo: https://github.com/chriskaliX/chriskaliX.github.io # site repo [optional]
 data-theme: light # default theme "dark" | "light"
 discus-identifier: powex # replace with your disqus shortname
 
@@ -25,8 +25,8 @@ author:
 googlewebfonts: family=Play:wght@400;700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,300;1,400;1,500;1,600;1,700;1,900
 
 # URL settings
-url: "https://chriskalix.github.com" # Domain Name of host. [username].github.io for github pages
-baseurl: "/" # sub folder for jekyll site. only if jekyll site not in root of host. leave blank if not wishd. always add / in front.
+url: "chriskaliX.github.com" # Domain Name of host. [username].github.io for github pages
+baseurl: # sub folder for jekyll site. only if jekyll site not in root of host. leave blank if not wishd. always add / in front.
 permalink: pretty
 
 # local
