@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-03-19T11:23:38+01:00</updated>
+ <updated>2022-03-19T11:52:21+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -13,7 +13,7 @@
 
  
  <entry>
-   <title>Linux_Rootkit初窥(一)IDT</title>
+   <title>Linux Rootkit初窥(一)IDT</title>
    <link href="https://chriskaliX.github.io/2022/03/19/linux-rootkit%E5%88%9D%E7%AA%A5-%E4%B8%80-idt"/>
    <updated>2022-03-19T00:00:00+01:00</updated>
    <id>https://chriskaliX.github.io/2022/03/19/Linux_Rootkit初窥(一)IDT</id>
@@ -31,11 +31,43 @@
 
 &lt;p&gt;首先，Intel CPU 在保护模式，提供四种模式，即 r0 ~ r3 层，用户层的应用程序一般运行在 r3 层，内核态的运行在 r0 层&lt;/p&gt;
 
-&lt;p&gt;中断分为可屏蔽和不可屏蔽中断，其中不可屏蔽中断在这里不讨论。中断向量是个0~255之间的数，其中 0~31 是 exceptions 以及不可屏蔽中断， 32~47 是可屏蔽中断，48~255 为软件中断。Linux 下通常使用的是 (0x80) ，即用户态通过 syscall 调用到内核函数&lt;/p&gt;
+&lt;p&gt;中断分为可屏蔽和不可屏蔽中断，其中不可屏蔽中断在这里不讨论。中断向量是个0~255之间的数，其中 0~31 是 exceptions 以及不可屏蔽中断， 32~47 是可屏蔽中断，48~255 为软件中断。Linux 下通常使用的是 (0x80) sys_call_table，即用户态通过 syscall 调用到内核函数。同样的，当我们为了获取 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys_call_table&lt;/code&gt; 地址也可以从 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IDT&lt;/code&gt; 中获取&lt;/p&gt;
 
 &lt;p&gt;什么是 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IDT&lt;/code&gt; ?  &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IDT&lt;/code&gt; 即 Interrupt Descriptor Table。是一个描述中断即其对应处理函数的线性表，包含三种不同类型的描述/类型。分别是 Task Gate Descriptor（Linux 不使用这种） / Interrupt Gate Descriptor / Trap Gate Descriptor&lt;/p&gt;
 
 &lt;p&gt;其中 Interrupt Gate Descriptor 用于中断的处理，需要关注的是 DPL（Descriptor Privilege Level）为0，因此用户态不能访问中断门&lt;/p&gt;
+
+&lt;p&gt;为了方便理解，借用一个图：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;![程序调用](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip&lt;/td&gt;
+      &lt;td&gt;imageView2/2/w/1200/format/webp)&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h4 id=&quot;in-linux&quot;&gt;in Linux&lt;/h4&gt;
+
+&lt;p&gt;在 Linux 中，IDT 的定义在 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;arch/x86/kernel/idt.c&lt;/code&gt; ，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;IDT_ENTRIES&lt;/code&gt; 固定为 256&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;gate_desc&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idt_table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IDT_ENTRIES&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__page_aligned_bss&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;其中 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gate_desc&lt;/code&gt; 定义如下&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;gate_struct&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;u16&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;offset_low&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;u16&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;segment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;idt_bits&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;u16&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;offset_middle&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#ifdef CONFIG_X86_64
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;u32&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;offset_high&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;u32&lt;/span&gt;     &lt;span class=&quot;n&quot;&gt;reserved&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__attribute__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;packed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;从项目出发&quot;&gt;从项目出发&lt;/h3&gt;
 
@@ -64,7 +96,11 @@
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;替换表的形式来完成劫持&lt;/p&gt;
+&lt;p&gt;替换表的形式来完成劫持，其中对 IDTR 寄存器的操作使用 LIDT 指令和 SIDT 指令。另外 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys_call_table&lt;/code&gt; 的 hook 应该方法也是类似，先在 IDT 表中找到 0x80 中断的位置，再根据特定 function 再 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys_call_table&lt;/code&gt; 中的偏移…&lt;/p&gt;
+
+&lt;p&gt;顺便贴一张 IDTR&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&amp;amp;refer=http%3A%2F%2Fimg.it610.com&amp;amp;app=2002&amp;amp;size=f9999,10000&amp;amp;q=a80&amp;amp;n=0&amp;amp;g=0n&amp;amp;fmt=auto?sec=1650278847&amp;amp;t=cec7d575642e0f888777f63f0507bee7&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;在字节的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;anti_rootkit&lt;/code&gt; 中我们截取 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;interrupt&lt;/code&gt; 检查部分，事实上 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sys_call_table&lt;/code&gt; 的检查部分也是一样的&lt;/p&gt;
 
@@ -122,9 +158,11 @@
   &lt;p&gt;有字节群中沈平推荐的两本，可以细细品读，我还没看…&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;1, The Rootkit Arsenal Escape and Evasion in the Dark Corners of the System by Bill Blunden， 2nd edition，第一版是中译本
-2, Rootkits and Bootkits Reversing Modern Malware and Next Generation Threats by Alex Matrosov, Eugene Rodionov, Sergey Bratus，有中译本
-3, &lt;a href=&quot;https://nskernel.gitbook.io/kernel-play-guide/hacking-interrupts-exceptions-and-trap-handlers/hooking-an-idt-handler&quot;&gt;nskernel-kernel-play-guide&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;1, The Rootkit Arsenal Escape and Evasion in the Dark Corners of the System by Bill Blunden， 2nd edition，第一版是中译本&lt;/p&gt;
+
+&lt;p&gt;2, Rootkits and Bootkits Reversing Modern Malware and Next Generation Threats by Alex Matrosov, Eugene Rodionov, Sergey Bratus，有中译本&lt;/p&gt;
+
+&lt;p&gt;3, &lt;a href=&quot;https://nskernel.gitbook.io/kernel-play-guide/hacking-interrupts-exceptions-and-trap-handlers/hooking-an-idt-handler&quot;&gt;nskernel-kernel-play-guide&lt;/a&gt;&lt;/p&gt;
 </content>
  </entry>
  
