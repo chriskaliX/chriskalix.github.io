@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Linux_Rootkit初窥(一)IDT
-description: Linux_Rootkit初窥(一)IDT
-summary: Linux_Rootkit初窥(一)IDT
+title: Linux Rootkit初窥(一)IDT
+description: Linux Rootkit初窥(一)IDT
+summary: Linux Rootkit初窥(一)IDT
 tags: security
 minute: 1
 ---
@@ -19,11 +19,38 @@ minute: 1
 
 首先，Intel CPU 在保护模式，提供四种模式，即 r0 ~ r3 层，用户层的应用程序一般运行在 r3 层，内核态的运行在 r0 层
 
-中断分为可屏蔽和不可屏蔽中断，其中不可屏蔽中断在这里不讨论。中断向量是个0~255之间的数，其中 0~31 是 exceptions 以及不可屏蔽中断， 32~47 是可屏蔽中断，48~255 为软件中断。Linux 下通常使用的是 (0x80) ，即用户态通过 syscall 调用到内核函数
+中断分为可屏蔽和不可屏蔽中断，其中不可屏蔽中断在这里不讨论。中断向量是个0~255之间的数，其中 0~31 是 exceptions 以及不可屏蔽中断， 32~47 是可屏蔽中断，48~255 为软件中断。Linux 下通常使用的是 (0x80) sys_call_table，即用户态通过 syscall 调用到内核函数。同样的，当我们为了获取 `sys_call_table` 地址也可以从 `IDT` 中获取
 
 什么是 `IDT` ?  `IDT` 即 Interrupt Descriptor Table。是一个描述中断即其对应处理函数的线性表，包含三种不同类型的描述/类型。分别是 Task Gate Descriptor（Linux 不使用这种） / Interrupt Gate Descriptor / Trap Gate Descriptor
 
 其中 Interrupt Gate Descriptor 用于中断的处理，需要关注的是 DPL（Descriptor Privilege Level）为0，因此用户态不能访问中断门
+
+为了方便理解，借用一个图：
+
+![程序调用](https://upload-images.jianshu.io/upload_images/2020390-fd9d366c674c96fd.jpg?imageMogr2/auto-orient/strip|imageView2/2/w/1200/format/webp)
+
+#### in Linux
+
+在 Linux 中，IDT 的定义在 `arch/x86/kernel/idt.c` ，`IDT_ENTRIES` 固定为 256
+
+```c
+gate_desc idt_table[IDT_ENTRIES] __page_aligned_bss;
+```
+
+其中 `gate_desc` 定义如下
+
+```c
+struct gate_struct {
+    u16     offset_low;
+    u16     segment;
+    struct idt_bits bits;
+    u16     offset_middle;
+#ifdef CONFIG_X86_64
+    u32     offset_high;
+    u32     reserved;
+#endif
+} __attribute__((packed));
+```
 
 ### 从项目出发
 
@@ -53,7 +80,11 @@ void idt_substitute(void)
 }
 ```
 
-替换表的形式来完成劫持
+替换表的形式来完成劫持，其中对 IDTR 寄存器的操作使用 LIDT 指令和 SIDT 指令。另外 `sys_call_table` 的 hook 应该方法也是类似，先在 IDT 表中找到 0x80 中断的位置，再根据特定 function 再 `sys_call_table` 中的偏移...
+
+顺便贴一张 IDTR
+
+![](https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimg.it610.com%2Fimage%2Finfo9%2F3a4a1cf12b0940c3a8115008a28511bd.jpg&refer=http%3A%2F%2Fimg.it610.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1650278847&t=cec7d575642e0f888777f63f0507bee7)
 
 在字节的 `anti_rootkit` 中我们截取 `interrupt` 检查部分，事实上 `sys_call_table` 的检查部分也是一样的
 
@@ -111,5 +142,7 @@ static void analyze_interrupts(void)
 > 有字节群中沈平推荐的两本，可以细细品读，我还没看...
 
 1, The Rootkit Arsenal Escape and Evasion in the Dark Corners of the System by Bill Blunden， 2nd edition，第一版是中译本
+
 2, Rootkits and Bootkits Reversing Modern Malware and Next Generation Threats by Alex Matrosov, Eugene Rodionov, Sergey Bratus，有中译本
+
 3, [nskernel-kernel-play-guide](https://nskernel.gitbook.io/kernel-play-guide/hacking-interrupts-exceptions-and-trap-handlers/hooking-an-idt-handler)
