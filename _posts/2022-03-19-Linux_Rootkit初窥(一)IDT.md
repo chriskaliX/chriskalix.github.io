@@ -4,7 +4,7 @@ title: Linux Rootkit初窥(一)IDT
 description: Linux Rootkit初窥(一)IDT
 summary: Linux Rootkit初窥(一)IDT
 tags: security
-minute: 1
+minute: 10
 ---
 
 ## 背景
