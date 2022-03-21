@@ -1,6 +1,15 @@
 [
   
     {
+      "title"    : "Linux Rootkit初窥(二)sys_call_table",
+      "description" : "Linux Rootkit初窥(二)sys_call_table",
+      "category" : "",
+      "tags"     : "security",
+      "url"      : "/2022/03/21/linux-rootkit%E5%88%9D%E7%AA%A5-%E4%BA%8C-sys-call-table",
+      "date"     : "2022-03-21 00:00:00 +0100"
+    } ,
+  
+    {
       "title"    : "Linux Rootkit初窥(一)IDT",
       "description" : "Linux Rootkit初窥(一)IDT",
       "category" : "",
