@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-05-19T17:55:31+02:00</updated>
+ <updated>2022-05-20T08:02:17+02:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -19,17 +19,13 @@
    <id>https://chriskaliX.github.io/2022/05/18/Linux_Rootkit初窥(三)Rootkit隐藏</id>
    <content type="html">&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;一个良好的 Rootkit 除了有敲门，Hook以外，隐藏网络/进程/内核模块也是十分重要的，同时对于我们分析是否存在内核后门，也非常重要&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;一个良好的 Rootkit 除了有敲门，Hook以外，隐藏网络/进程/内核模块也是十分重要的，同时对于我们分析是否存在内核后门，也非常重要&lt;/p&gt;
 
 &lt;p&gt;以下部分代码基于 &lt;a href=&quot;https://github.com/f0rb1dd3n/Reptile&quot;&gt;Reptile&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;proc-隐藏&quot;&gt;proc 隐藏&lt;/h2&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;a href=&quot;https://github.com/f0rb1dd3n/Reptile/blob/master/kernel/proc.c&quot;&gt;代码地址&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/f0rb1dd3n/Reptile/blob/master/kernel/proc.c&quot;&gt;代码地址&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;判断可见&quot;&gt;判断可见&lt;/h3&gt;
 
