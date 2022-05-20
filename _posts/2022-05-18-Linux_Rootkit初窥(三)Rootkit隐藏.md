@@ -9,13 +9,13 @@ minute: 15
 
 ## 背景
 
-> 一个良好的 Rootkit 除了有敲门，Hook以外，隐藏网络/进程/内核模块也是十分重要的，同时对于我们分析是否存在内核后门，也非常重要
+一个良好的 Rootkit 除了有敲门，Hook以外，隐藏网络/进程/内核模块也是十分重要的，同时对于我们分析是否存在内核后门，也非常重要
 
 以下部分代码基于 [Reptile](https://github.com/f0rb1dd3n/Reptile)
 
 ## proc 隐藏
 
-> [代码地址](https://github.com/f0rb1dd3n/Reptile/blob/master/kernel/proc.c)
+[代码地址](https://github.com/f0rb1dd3n/Reptile/blob/master/kernel/proc.c)
 
 ### 判断可见
 
