@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-08-21T07:54:23+02:00</updated>
+ <updated>2022-08-21T08:13:18+02:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -34,7 +34,7 @@
 
 &lt;p&gt;本身谈不上大的改动或者设计，因为 WAF 升级过程中需要同时兼容两个版本，没有做很大变更，大致如下。原先 WAF 大致如下&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-old.jpg&quot; alt=&quot;WAF-OLD&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-old.png&quot; alt=&quot;WAF-OLD&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;实际遇到的问题&quot;&gt;实际遇到的问题&lt;/h3&gt;
 
@@ -72,7 +72,7 @@
   &lt;p&gt;图中的 Redis 被移除，WAF-admin 重构为 Java（标准化，可以 CI/CD），Mysql 不再自己维护，Storm 全部重写为 Flink 并且满足新的需求&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-new.jpg&quot; alt=&quot;WAF-NEW&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-new.png&quot; alt=&quot;WAF-NEW&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;具体细节&quot;&gt;具体细节&lt;/h2&gt;
 
