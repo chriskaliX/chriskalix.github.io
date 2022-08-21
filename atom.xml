@@ -4,13 +4,203 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-05-20T08:02:17+02:00</updated>
+ <updated>2022-08-21T07:54:23+02:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
    <email>chriskali@163.com</email>
  </author>
 
+ 
+ <entry>
+   <title>WAF 开发实战</title>
+   <link href="https://chriskaliX.github.io/2022/08/21/waf-dev"/>
+   <updated>2022-08-21T00:00:00+02:00</updated>
+   <id>https://chriskaliX.github.io/2022/08/21/WAF_dev</id>
+   <content type="html">&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
+
+&lt;p&gt;爬虫越来越多，峰值流量越来越高，非标应用难以维护等，对于 WAF 产生了挑战。通过 WAF 重构，减轻历史负担，承担更多安全场景&lt;/p&gt;
+
+&lt;h2 id=&quot;需求&quot;&gt;需求&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;性能上提升&lt;/li&gt;
+  &lt;li&gt;能够更好地处理大流量场景&lt;/li&gt;
+  &lt;li&gt;更加合理标准化的架构方案&lt;/li&gt;
+  &lt;li&gt;函数级别的灰度控制能力&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;设计&quot;&gt;设计&lt;/h2&gt;
+
+&lt;p&gt;本身谈不上大的改动或者设计，因为 WAF 升级过程中需要同时兼容两个版本，没有做很大变更，大致如下。原先 WAF 大致如下&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-old.jpg&quot; alt=&quot;WAF-OLD&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;实际遇到的问题&quot;&gt;实际遇到的问题&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Redis&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Redis 负责规则/开关的存储，由 WAF-admin 控制同步&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Nginx-Lua 部分需要和 Redis/WAF-admin 通讯（storm 为 filebeat 同步计算）。而问题则是 Redis 因为历史原因通过 IP 连接单库，虽然有从库，仍然有风险造成类似单点故障的问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Storm&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Storm 为计频，满足实时计算的封禁需求&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;为组内早先自己搭建，完全由自己维护。目前公司内部不再使用 storm 集群，即自维护的集群如果出现了主节点 down 等问题，一时间也无法完全恢复，同样容易造成单点故障问题&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;WAF-admin&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;WAF-admin 是主控端，负责 Nginx-Lua 控制，数据对接处理等&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;完全由 Python 编写，代码中有许多 Hardcode 的地方，无法 CI/CD 走标准发布。在特殊情况没法及时扩容等&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Others&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;一些分布在机器上的定时任务，脚本，用于 WAF 的分析等，没有良好的备份/标准文档等&lt;/p&gt;
+
+&lt;h3 id=&quot;改动&quot;&gt;改动&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;图中的 Redis 被移除，WAF-admin 重构为 Java（标准化，可以 CI/CD），Mysql 不再自己维护，Storm 全部重写为 Flink 并且满足新的需求&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/waf-new.jpg&quot; alt=&quot;WAF-NEW&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;具体细节&quot;&gt;具体细节&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;WAF 开发的具体笔记，仅记录重要部分&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;nginx-lua&quot;&gt;Nginx-Lua&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;公司的 WAF 直接以 Lua 的形式部署在 LB 之后的 Nginx 集群。通过伪代码的形式展示存在的问题和修复&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;错误的函数使用&quot;&gt;错误的函数使用&lt;/h4&gt;
+
+&lt;p&gt;入职接手之后，碰到过一个线上的问题。有一个接口，单独使用 ip + url 的形式无法封禁。经过排查，是一个很小的点。在 Nginx 中，某个 Server 配置如下&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;server {
+    ...
+    server_name xxx.test.com xxx1.test.com;
+    ...
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;而当时封禁函数使用的地址获取方式为&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ngx.var.server_name .. ngx.var.uri
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;其中 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ngx.var.server_name&lt;/code&gt; 默认获取 server_name 的第一个，早在 2015 年就有人提过这个&lt;a href=&quot;https://github.com/openresty/openresty/issues/98&quot;&gt;问题&lt;/a&gt;。&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ngx.var.server_name&lt;/code&gt; 本身使用目的不是如此，而应该使用内置的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ngx.var.host&lt;/code&gt; 来获取&lt;/p&gt;
+
+&lt;h4 id=&quot;重复的字符操作&quot;&gt;重复的字符操作&lt;/h4&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;在老版本的 Lua 中，经常能看到一些字符串的重复操作。常见的是：从 nginx 共享内存中读取规则，并且解析。伪代码如下&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;demo_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;config&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rules&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;demo&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;pairs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;!!!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这样的代码几乎出现在每个函数中，穿插在对应的 access 流程里。假设我们有 10 个 check 函数，那么每次请求我们都需要做 10 次无效的字符串 split 操作。在后续的对比里，这段 split 所占的大约为 15 ～ 20%&lt;/p&gt;
+
+&lt;p&gt;如何解决这个问题? 很尴尬的是，这个 WAF 代码原先并无引入 worker，没有缓存的功能。大致为，在 nginx 的 init_worker 阶段引入 worker 文件，做秒级的规则 pull 和解析。代码也很简单，写好函数，定时调用即可&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Segfault&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;当我开心的写完，引入这个文件之后，我们发现在一些测试机器上会出现 segment fault 的问题，我们 dump 下这个文件，稍微看了一下。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gdb &amp;lt;nginx&amp;gt; core
+&amp;gt; (gdb) bt
+`text`
+#0 ... in ngx_http_core_create_srv_conf()
+#1 ... in ngx_http_lua_init_worker()
+#2 ... in ngx_worker_process_init()
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;大致可以看出跟我们引入的 init_worker 文件相关，函数定位在 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ngx_http_core_create_srv_conf&lt;/code&gt;。通过查询，我们看到有一个类似 &lt;a href=&quot;https://github.com/openresty/lua-nginx-module/issues/1348&quot;&gt;issue&lt;/a&gt;。大致原因为：当 nginx 版本 &amp;gt;= 1.15.0 且 lua-nginx-module 组件 &amp;lt;= 0.10.14 时会出现这个问题。&lt;/p&gt;
+
+&lt;p&gt;这种往往是在后期测试时发现，能搜到的只有官方的特殊 issue。同时对于 WAF 这种影响面很大的，上线发布等要有合理的测试、灰度等发现这类比较隐蔽的问题&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;多次字符拼接&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;在原先 Log 日志打印部分，能看到类似以下代码&lt;/p&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clientip&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; [&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;time&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; ]&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot; &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;......&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;有类似超 9 个字符串连续拼接的场景。在 Lua 中每次 .. 拼接意味着开辟新空间，产生拷贝。这种多次拼接的长字符串拼接，对性能会有较大的影响，会有频繁 GC 的风险。在新 WAF 中改为通过 table concat 的方式做拼接。&lt;/p&gt;
+
+&lt;p&gt;concat 函数本身不会有频繁申请拷贝的操作，而是当写满一个定长的 BUFFER 之后，才会生成一个 TString 做一次内存合并。在其他的一些简单场景，如单次使用 .. 进行拼接，则无需做修改。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;多维度限流&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;之前的限流完全依赖两个，一个是实时处理（Storm 根据日志计频），但是往往会有小的延时（例如 10 秒）；另一个就是单机器上的 URL 限流（兜底）。我们需要一个更为灵活的多维度限流&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;调研之后，我们需要一种支持任意 Header 字段，Cookie 字段的限流，来满足一些活动场景下，大流量代拍、恶意刷取的场景。限流部分可以使用 lua-resty-limit-traffic，这种使用类似于匀速器，即如果设定 1 秒内限定 rate 100，则任意的 0.1 秒都是均匀的。由于引入组件还需要做稳定性测试，延长了整个项目的周期，所以决定直接用共享内存实现&lt;/p&gt;
+
+&lt;p&gt;伪代码如下:&lt;/p&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;advanced_cc_check&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;advanced_cc_check&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;on&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;flush_expired&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rule&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_rule&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;advanced_cc&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;pairs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;rule&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;do&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ip&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;advanced_cc&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;..&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uriip&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;count&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;incr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;cache&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;counter&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xxx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+                &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;elseif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;cookie&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;elseif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;header&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;elseif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;field&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;arg&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+                &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;其余限流部分可以自己实现，和 IP 部分代码类似&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;其余&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;其余则为灰度，版本控制，规则更新等&lt;/p&gt;
+
+&lt;h3 id=&quot;flink&quot;&gt;Flink&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;待更新…&lt;/p&gt;
+&lt;/blockquote&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Linux Rootkit初窥(三)Rootkit隐藏</title>
