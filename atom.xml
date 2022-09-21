@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-09-13T18:39:24+02:00</updated>
+ <updated>2022-09-21T16:25:02+02:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -180,6 +180,32 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;其实跟之前不一样，需要有两个键值对的方式，就是因为要使用 mapping 缓存机制，在第一次循环的时候把恶意这个类给加载到缓存，在第二次运行到 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;getClassFromMapping&lt;/code&gt; 的时候，就直接返回了，绕过了下面的黑名单检查（虽然黑名单检查本身就不对…）&lt;/p&gt;
+
+&lt;h4 id=&quot;1268&quot;&gt;1.2.68&lt;/h4&gt;
+
+&lt;p&gt;持续最长的一个问题，当然除了 1.2.83 的 Throwable 不算。黑名单的绕过机制，基于 java.lang.AutoCloseable…&lt;/p&gt;
+
+&lt;h3 id=&quot;修复&quot;&gt;修复&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;修复是一个大问题，有时候并不是想的那么简单…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;因为公司内部有标准的发布系统，根据发布卡点 + 内部排查，版本限制并不是一个大问题，当然也有例外&lt;/p&gt;
+
+&lt;h4 id=&quot;大数据系统&quot;&gt;大数据系统&lt;/h4&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;大数据有很多自编写的 UDF，在/离线任务，这些不经过发布系统。还有一些很老的边缘系统，通过 Nginx 直接转发到后端应用，通过梳理 nginx config，统一排查&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;根据 google/log4jscanner 魔改了一下，做了一个 jar 包的扫描，排除了一下历史上的问题。这个很通用，我们把历史的一些（包括 log4j）的都添加到规则内，对上传的 jar 包做检查&lt;/p&gt;
+
+&lt;h4 id=&quot;safemode&quot;&gt;safemode&lt;/h4&gt;
+
+&lt;p&gt;理论上升级到 68 以上，基本没有危害（Throwable 的 83也有问题，不过也有一定条件，还行）。但是，由于 inet4 还是会出网，有段时间收到 CERT 的一个整改，就是因为有人扫 inet 收到 DNS 请求，说有 fastjson 漏洞了，需要整改…其实在线上 DNS 告警中，我们看到了这个，当时不认为有利用价值，CERT 认为有，所以一咬牙我们开始推行 safemode，整个过程中还是会有个别问题… TODO&lt;/p&gt;
+
+&lt;h2 id=&quot;黑白盒检测&quot;&gt;黑白盒检测&lt;/h2&gt;
 </content>
  </entry>
  
