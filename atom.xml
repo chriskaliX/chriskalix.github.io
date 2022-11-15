@@ -4,13 +4,53 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-11-14T15:48:29+01:00</updated>
+ <updated>2022-11-15T14:36:29+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
    <email>chriskali@163.com</email>
  </author>
 
+ 
+ <entry>
+   <title>DevSecOps BlackBox</title>
+   <link href="https://chriskaliX.github.io/2022/11/15/devsecops-blackbox"/>
+   <updated>2022-11-15T00:00:00+01:00</updated>
+   <id>https://chriskaliX.github.io/2022/11/15/DevSecOps_BlackBox</id>
+   <content type="html">&lt;h1 id=&quot;简介&quot;&gt;简介&lt;/h1&gt;
+
+&lt;p&gt;黑盒扫描是 DevSecOps 中较为重要的一环，往往也是 SDL 建设初期最先配备，效果最好的安全工具&lt;/p&gt;
+
+&lt;h1 id=&quot;概要&quot;&gt;概要&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;本文将从以下几个部分开始讨论&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;黑盒扫描架构
+    &lt;ul&gt;
+      &lt;li&gt;流量镜像&lt;/li&gt;
+      &lt;li&gt;消息去重&lt;/li&gt;
+      &lt;li&gt;扫描 Payload&lt;/li&gt;
+      &lt;li&gt;企业特性适配&lt;/li&gt;
+      &lt;li&gt;API 生命周期&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;资产管理&lt;/li&gt;
+  &lt;li&gt;问题管理
+    &lt;ul&gt;
+      &lt;li&gt;脏数据&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;黑盒扫描架构&quot;&gt;黑盒扫描架构&lt;/h1&gt;
+
+&lt;h2 id=&quot;流量镜像&quot;&gt;流量镜像&lt;/h2&gt;
+
+</content>
+ </entry>
  
  <entry>
    <title>OSS related Incident</title>
@@ -37,6 +77,10 @@
 
 &lt;blockquote&gt;
   &lt;p&gt;PNG，全称为 Portable Network Graphics，是一种支持无损压缩的位图图形格式，支持索引、灰度、RGB三种颜色方案以及以及Alpha通道等特性。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;另外这个适用于不止 PNG，未压缩的 JPG 这些同理&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;大部分的格式等，都可以从 &lt;a href=&quot;https://zh.wikipedia.org/wiki/PNG&quot;&gt;wikipedia&lt;/a&gt; 中发现问题的答案，以及我随手翻阅的 &lt;a href=&quot;https://blog.mythsman.com/post/5d2d62b4a2005d74040ef7eb/&quot;&gt;博客&lt;/a&gt;，有以下四个数据块&lt;/p&gt;
@@ -79,7 +123,8 @@
 
 &lt;h2 id=&quot;其他&quot;&gt;其他&lt;/h2&gt;
 
-&lt;p&gt;当然还有更花的…先不做公开了&lt;/p&gt;
+&lt;p&gt;当然还有更花的…先不做公开了
+给个 demo，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;curl https://chriskaliX.github.io/assets/imgs/test.jpg -o test.mpeg&lt;/code&gt;&lt;/p&gt;
 </content>
  </entry>
  

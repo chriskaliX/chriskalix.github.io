@@ -1,6 +1,15 @@
 [
   
     {
+      "title"    : "DevSecOps BlackBox",
+      "description" : "DevSecOps BlackBox",
+      "category" : "",
+      "tags"     : "security",
+      "url"      : "/2022/11/15/devsecops-blackbox",
+      "date"     : "2022-11-15 00:00:00 +0100"
+    } ,
+  
+    {
       "title"    : "OSS related Incident",
       "description" : "OSS related Incident",
       "category" : "",
