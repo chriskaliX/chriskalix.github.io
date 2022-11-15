@@ -27,6 +27,8 @@ minute: 10
 
 > PNG，全称为 Portable Network Graphics，是一种支持无损压缩的位图图形格式，支持索引、灰度、RGB三种颜色方案以及以及Alpha通道等特性。
 
+> 另外这个适用于不止 PNG，未压缩的 JPG 这些同理
+
 大部分的格式等，都可以从 [wikipedia](https://zh.wikipedia.org/wiki/PNG) 中发现问题的答案，以及我随手翻阅的 [博客](https://blog.mythsman.com/post/5d2d62b4a2005d74040ef7eb/)，有以下四个数据块
 
 - 文件头数据块IHDR（header chunk）：包含有图像基本信息，作为第一个数据块出现并只出现一次。
@@ -62,3 +64,4 @@ minute: 10
 ## 其他
 
 当然还有更花的...先不做公开了
+给个 demo，`curl https://chriskaliX.github.io/assets/imgs/test.jpg -o test.mpeg`
