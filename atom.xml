@@ -4,7 +4,7 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-11-15T14:36:29+01:00</updated>
+ <updated>2022-11-22T08:36:41+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
@@ -19,7 +19,7 @@
    <id>https://chriskaliX.github.io/2022/11/15/DevSecOps_BlackBox</id>
    <content type="html">&lt;h1 id=&quot;简介&quot;&gt;简介&lt;/h1&gt;
 
-&lt;p&gt;黑盒扫描是 DevSecOps 中较为重要的一环，往往也是 SDL 建设初期最先配备，效果最好的安全工具&lt;/p&gt;
+&lt;p&gt;黑盒扫描是 DevSecOps 中较为重要的一环，往往也是 SDL 建设初期最先配备，效果最好的安全工具。本文为工作记录的随笔，比较潦草不细节，主要是怕忘记了&lt;/p&gt;
 
 &lt;h1 id=&quot;概要&quot;&gt;概要&lt;/h1&gt;
 
@@ -49,6 +49,165 @@
 
 &lt;h2 id=&quot;流量镜像&quot;&gt;流量镜像&lt;/h2&gt;
 
+&lt;blockquote&gt;
+  &lt;p&gt;流量镜像通过在 Nginx 下加载 Lua 的形式，将数据包提取传输，demo 如下&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;init_phase - 跳过&lt;/p&gt;
+
+&lt;p&gt;access_phase&lt;/p&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;time&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;now&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;scheme&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scheme&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;uri&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;uri&lt;/span&gt; 
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;client_ip&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;remote_addr&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;args&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;host&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;host&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;method&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_method&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; 
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;method&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;POST&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_body_file&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;post_data&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_body_data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;req&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;~=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;truncated&quot;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;-- 防止流量黑洞，在 Iast 扫描添加特殊标识过滤&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Iast&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;headers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;headers&lt;/span&gt;
+		&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;resp_headers&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ngx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get_headers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;-- move to worker if you need&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_producer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;producer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;broker_list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;producer_type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;async&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;request_timeout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dkjson&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;local&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;async_producer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;iast&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;nil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ok&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;debug&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;body_filter_by_lua_file （敏感信息检测，先不放了）&lt;/p&gt;
+
+&lt;div class=&quot;language-lua highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;消息去重&quot;&gt;消息去重&lt;/h2&gt;
+
+&lt;p&gt;根据五元组进行过滤，分别为&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;METHOD&lt;/li&gt;
+  &lt;li&gt;SCHEMA&lt;/li&gt;
+  &lt;li&gt;HOST (WITH PORT)&lt;/li&gt;
+  &lt;li&gt;PATH&lt;/li&gt;
+  &lt;li&gt;PARAMS&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;用 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Bloom filter&lt;/code&gt; 过滤，理想汽车的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DevSecOps&lt;/code&gt; 文章里也是这么说的。其实也要考虑到 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;API&lt;/code&gt; 应用自身的问题，在接口五元组不变的情况下，内部逻辑仍有可能发生变化从而产生漏洞（例如下游接口变更等），每个接口需要有一个 TTL，所以方法逻辑如下&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;获取五元组，以及对应的 HASH&lt;/li&gt;
+  &lt;li&gt;缓存这个 Hash，给定 TTL&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;在接口数量不大的情况下，不用布隆过滤器也可以&lt;/p&gt;
+
+&lt;h2 id=&quot;扫描-payload&quot;&gt;扫描 Payload&lt;/h2&gt;
+
+&lt;p&gt;这个其实比较定制化，对于大部分的漏洞扫描，都能在单次请求中完成判断，不需要多个报文上下文的形式。这里分类讨论&lt;/p&gt;
+
+&lt;p&gt;因为扫描 Payload 这个部分，大部分情况可能需要自己去做。因为目前能看到的 xray 或者 AWVS 还是接管了整个扫描流程（即报文拆解，Payload 注入，报文拼接，漏洞判断），但是甲方的这种特质场景下，往往需要自己介入大部分流程。&lt;/p&gt;
+
+&lt;p&gt;例如报文的解析，如果是 AES 加密需要先做解密，如果有 timestamp 或者 sign 校验需要手动构成等等&lt;/p&gt;
+
+&lt;p&gt;看起来像是造轮子，其实轮子也是可以抽象的，按照上面步骤做成 plugin 即可&lt;/p&gt;
+
+&lt;h3 id=&quot;sql-injection&quot;&gt;SQL Injection&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;不光是 SQL 注入，&lt;a href=&quot;https://github.com/stamparm&quot;&gt;stamparm&lt;/a&gt; 这个小哥很多的 Payload 很有意思，方便直接提取使用&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;简单来说，如果根据 SQLMap 的话，SQL 注入可以分为很多种，BEUSTQ&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Boolean&lt;/li&gt;
+  &lt;li&gt;Error&lt;/li&gt;
+  &lt;li&gt;Union&lt;/li&gt;
+  &lt;li&gt;Stack&lt;/li&gt;
+  &lt;li&gt;Time-based&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;如果抽象简化一下，可以变成：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;基于报错的
+ 插入 Payload，匹配返回内容&lt;/li&gt;
+  &lt;li&gt;基于布尔的
+ 可以看一下 SQLMap 源码，有一个页面相似度的检测，记得好像是 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0.96&lt;/code&gt; 认为是相似的，很早以前看过，挺有意思&lt;/li&gt;
+  &lt;li&gt;基于时间的
+ 这个其实比较简单， Time-based，有可能会有误报多的情况。发送多次即可&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;xss&quot;&gt;XSS&lt;/h3&gt;
+
+&lt;p&gt;XSS经典题目之，XSS分类&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Dom-based&lt;/li&gt;
+  &lt;li&gt;Reflect&lt;/li&gt;
+  &lt;li&gt;Store&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;反射通过 chrome driver 或者匹配的形式检索可在单个包的上下文完成。Dom 的有一点特殊，后续可以展开讲（通过 source / sink 的方式，或者避免危险 sink 的方式）&lt;a href=&quot;https://medium.com/@fath3ad.22/understanding-dom-based-xss-sources-and-sinks-c17ae4bc7455&quot;&gt;相关文章&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Store-based则通过反连平台判断，单个请求的上下文无法判断&lt;/p&gt;
+
+&lt;h3 id=&quot;rce--lfi-&quot;&gt;RCE / LFI …&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;本质上和上述同理&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Payload 搜集，单个上下文的判断&lt;/p&gt;
+
+&lt;h2 id=&quot;企业特性适配&quot;&gt;企业特性适配&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;为什么 xray / awvs 这种无法无缝接入，肯定也是有原因的…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;企业内为了保证接口安全，通常会有反重放、加密、混淆等，通常 H5 的请求和 App 的请求等，处理也会不同。相当于在扫描器的前后，我们需要两个 Interface，处理掉解密加密的过程，这里没有什么特殊的地方，重点是需要去做适配&lt;/p&gt;
+
+&lt;h2 id=&quot;api-管理--生命周期&quot;&gt;API 管理 &amp;amp; 生命周期&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;API资源本身的集中化管理，对安全来说是非常宝贵的数据&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;接口生命周期事实上跟黑盒关系不是很大，我们从黑盒安全这个相对狭隘的角度窥测一下。我们要尽可能丰富 API 维度的数据，从 API 的上线时间，调用频次，返回信息打标，请求信息打标。黑盒以及IAST是为数不多的能直接对接口建立完整数据的工具，很多时候如果黑盒仅仅只是拿来扫描，会丧失掉很多有价值的有意义的数据&lt;/p&gt;
+
+&lt;p&gt;之前汉堡也发过根据接口的 CVSS 评分，其实可以理解成一个 API 最终对应到了哪些数据操作。这个对数据安全以及后期的越权治理非常重要。方法也很简单，先根据 DB 打标（DB分级），然后根据黑盒的数据获取到全链路的请求 ID，查询最后实际操作的 DB。操作的 DB 越核心，越多，说明这个 API 越敏感。对于企业内大量级的 API，这是至关重要的&lt;/p&gt;
+
+&lt;h1 id=&quot;资产管理&quot;&gt;资产管理&lt;/h1&gt;
+
+&lt;p&gt;跟上面 API 管理 &amp;amp; 生命周期有所重复了。核心就是：不要只把黑盒作为一个扫描工具&lt;/p&gt;
+
+&lt;h1 id=&quot;问题管理&quot;&gt;问题管理&lt;/h1&gt;
+
+&lt;h2 id=&quot;脏数据&quot;&gt;脏数据&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;特殊标识，压测标/扫描标，在 Agent 侧 hook 数据写入丢弃&lt;/li&gt;
+  &lt;li&gt;影子库&lt;/li&gt;
+  &lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
 </content>
  </entry>
  
