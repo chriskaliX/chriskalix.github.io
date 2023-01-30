@@ -4,13 +4,102 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2022-12-05T13:17:34+01:00</updated>
+ <updated>2023-01-30T04:20:45+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
    <email>chriskali@163.com</email>
  </author>
 
+ 
+ <entry>
+   <title>人机识别</title>
+   <link href="https://chriskaliX.github.io/2023/01/29/%E4%BA%BA%E6%9C%BA%E8%AF%86%E5%88%AB"/>
+   <updated>2023-01-29T00:00:00+01:00</updated>
+   <id>https://chriskaliX.github.io/2023/01/29/人机识别</id>
+   <content type="html">&lt;h2 id=&quot;简介&quot;&gt;简介&lt;/h2&gt;
+
+&lt;p&gt;有很多项目，看过之后不记录就会越来越生疏…以下记录内部人机识别项目架构以及如何作用与线上&lt;/p&gt;
+
+&lt;h2 id=&quot;架构&quot;&gt;架构&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/renji.png&quot; alt=&quot;Arch&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;方案其实比较类似，一些大厂商（前几年）应该也是这个方案。方案优势为：仅需要前端，WAF，人机识别模块三个部分配合，接入成本较低，在 WAF 写一个转发函数，人机识别模块完成后，覆盖推进只需要推进前端 js 脚本即可。这样的接入方式其实很多，在内部还有一个特殊接口治理后台，也是通过类似的方式进行处理。&lt;/p&gt;
+
+&lt;p&gt;整体可用性高，在 js 编写没有大的问题的情况下，在 WAF 侧和 人机模块 侧都做了熔断开关以及监控，基本不影响线上正常用户。当然有极少数情况下，因为规则问题，会拦截少部分正常用户。&lt;/p&gt;
+
+&lt;p&gt;重点接入的模块有例如：SSO，商品创建等，主要防护 H5 下一些容易被恶意利用的接口&lt;/p&gt;
+
+&lt;h2 id=&quot;细节&quot;&gt;细节&lt;/h2&gt;
+
+&lt;h3 id=&quot;js&quot;&gt;JS&lt;/h3&gt;
+
+&lt;p&gt;首先，我们需要了解采集的数据范围。常见的大致有：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-txt&quot;&gt;1. basic
+    1.1. ua类型(win/linux/ios/android...)
+    1.2. platform, os, arch, devicetype, browser 等
+2. header
+    connection, historylength, accept, Upgrade-Insecure-Requests 等
+3. navigator
+    3.1. 插件信息（注意浏览器区别，IE）
+    3.2. mimitypes
+    3.3. donotrack
+    3.4. useragent
+    3.5. language
+    3.6. vendor
+    3.7. appversion
+    3.8. platform
+    3.9. battery
+    ...等等
+4. screen
+    width/height/availWidth/availHeight/colorDepth/pixelDepth等等...
+5. 经纬度
+6. performance
+    performance.timing下的几个，例如：connectEnd, connectStart，遍历打包上传
+7. **canvas fingerprint**
+    canvas 是一种HTML5 API，用于在网页上绘出2D图像和动画。通过绘画获取前端浏览器指纹，但是这个指纹本身不具备唯一性（这里踩过坑，后续说），唯一指纹最好，还是通过navigator或者其他对象下的数据进行再 hash
+8. 其他判断以及数据
+    一些其他的，例如：
+    8.1. webdriver 指纹
+    8.2. 鼠标滑动点击轨迹等等
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;js的数据采集完毕后，压缩到某参数中，转发到后段后再进行解压分析。前端的 js 本身为了防逆向调试会有其他的措施，例如混淆，反调试等…这里又有很多东西挖掘，例如抖音的 jsvmp，相关文章&lt;a href=&quot;https://juejin.cn/post/7156158350407761933&quot;&gt;链接&lt;/a&gt;。当然逆向其实是一个门槛，归根到底，数据在client side生成，一定存在逆向的方式，但是好的混淆方式，可以大幅度提高破解成本。包括不限于在人机这种场景中，所有的请求都可以做混淆验签，劝退小白…&lt;/p&gt;
+
+&lt;h3 id=&quot;waf-侧&quot;&gt;WAF 侧&lt;/h3&gt;
+
+&lt;p&gt;waf 侧没啥好说的，access阶段的一个转发函数，需要注意的是，每个请求的 timeout 以及整体熔断一定要加上…&lt;/p&gt;
+
+&lt;h3 id=&quot;人机后台&quot;&gt;人机后台&lt;/h3&gt;
+
+&lt;p&gt;后台主要的处理逻辑为&lt;/p&gt;
+
+&lt;p&gt;解码 -&amp;gt; 初始逻辑（例如空参数，允许空参数容忍度等） -&amp;gt; 规则链（动态规则加载，例如 groovy）-&amp;gt; 处理返回。规则部分不便于透露，但有一些很简单的，例如：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;performance.timing 下时间与当前时间对比差额&lt;/li&gt;
+  &lt;li&gt;防重&lt;/li&gt;
+  &lt;li&gt;ua 对比（useragent与navigator中的ua，当然这个也有坑，一些情况下不是直接对等的）&lt;/li&gt;
+  &lt;li&gt;鼠标点击/滑动轨迹重叠&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;等等…&lt;/p&gt;
+
+&lt;h2 id=&quot;写在最后&quot;&gt;写在最后&lt;/h2&gt;
+
+&lt;p&gt;还有一些内容在这之外，例如：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;工程化，前端安全脚本发布的 CI/CD 标准&lt;/li&gt;
+  &lt;li&gt;对接相应埋点的异常拦截告警，人工处理友好&lt;/li&gt;
+  &lt;li&gt;规则下发，迭代，运营维护 SOP 以及文档&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;当然因为人力有限，迭代在之后就越来越少了…期间遇到的一些坑，例如：useragent 和 navigator.useragent 其实在一些场景下并不是 100% 一致；仅依靠 canvas fingerprint 拦截可能会存在误封；webdriver 拦截识别等…如若有兴趣，再继续探讨吧～&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Elkeid v1.9.1（初步学习版）</title>
