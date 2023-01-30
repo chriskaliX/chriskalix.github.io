@@ -4,13 +4,203 @@
  <title>chriskali</title>
  <link href="https://chriskaliX.github.io/atom.xml" rel="self"/>
  <link href="https://chriskaliX.github.io/"/>
- <updated>2023-01-30T04:20:45+01:00</updated>
+ <updated>2023-01-30T11:23:21+01:00</updated>
  <id>https://chriskaliX.github.io</id>
  <author>
    <name>chriskali</name>
    <email>chriskali@163.com</email>
  </author>
 
+ 
+ <entry>
+   <title>容器安全(一)Kubernetes Log Audit</title>
+   <link href="https://chriskaliX.github.io/2023/01/30/%E5%AE%B9%E5%99%A8%E5%AE%89%E5%85%A8-%E4%B8%80-kubernetes-log-audit"/>
+   <updated>2023-01-30T00:00:00+01:00</updated>
+   <id>https://chriskaliX.github.io/2023/01/30/容器安全(一)Kubernetes_log_audit</id>
+   <content type="html">&lt;h2 id=&quot;简介&quot;&gt;简介&lt;/h2&gt;
+
+&lt;p&gt;近两年，公司的容器化推进成果显著，容器化率明显提高。过万虚拟机中，有大部分已经运行在容器环境中，容器安全变得越来越重要…而我也从前面的项目中释放出来，暂时投入到容器安全中…&lt;/p&gt;
+
+&lt;h3 id=&quot;从攻击视角&quot;&gt;从攻击视角&lt;/h3&gt;
+
+&lt;p&gt;借用一张 aquasec 的图&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://chriskaliX.github.io/assets/imgs/kubernetes-1.png&quot; alt=&quot;Kubernetes-1&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;从建设视角&quot;&gt;从建设视角&lt;/h3&gt;
+
+&lt;p&gt;以安全卡点/切面的原则出发，我们粗略的将容器的安全分为&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;构建（CI/CD，SCA）&lt;/li&gt;
+  &lt;li&gt;容器基础设施（基础环境配置，Dockerfile模板，etcd组件等等）&lt;/li&gt;
+  &lt;li&gt;运行时安全（HIDS，目前暂时是 osquery 和部分自研环境）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;按理来说，应该从 CI/CD，基础设施开始搞，但是很惭愧，我先看到 kubernetes log audit，认为相比来说是一个了解整个容器环境和 ROI 相对比较高的一个入手点&lt;/p&gt;
+
+&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;安全容器建设整体落后于 k8s 推进，即 k8s 整体已经推进完毕，安全组后续介入，属于历史问题…&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;learn-from-the-best&quot;&gt;Learn from the best&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;对于开始一个项目，最好的学习方式一定是先认真学习现有的方案&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/falcosecurity/plugins/blob/master/plugins/k8saudit/rules/k8s_audit_rules.yaml&quot;&gt;Falco-rules&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.elastic.co/guide/en/security/current/kubernetes-pod-created-with-hostpid.html&quot;&gt;ElasticSearch-rules&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;以 Falco 为例，我们可以通过大致梳理一下规则来了解（毕竟即便要实际运用，里面也有很多配置需要修改…另外我们也需要添加自己的一些审计规则）&lt;/p&gt;
+
+&lt;h2 id=&quot;规则-details&quot;&gt;规则 Details&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Disallowed K8s User&lt;/p&gt;
+
+    &lt;p&gt;K8s 用户白名单。在 Falco 中 allowlist 如下，当然还有 eks 的，国内的应该没有在使用的，可以剔除掉&lt;/p&gt;
+
+    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;allowed_k8s_users&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;minikube&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;minikube-user&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kubelet&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kops&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;admin&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kube&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kube-proxy&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kube-apiserver-healthcheck&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kubernetes-admin&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;nv&quot;&gt;vertical_pod_autoscaler_users&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;nv&quot;&gt;cluster-autoscaler&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;system:addon-manager&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;cloud-controller-manager&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;,&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;system:kube-controller-manager&quot;&lt;/span&gt;
+     &lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+
+    &lt;p&gt;这里涉及到目前集群环境的一个大问题（也是很简单的大问题），就是前期搭建容器环境的时候并没有使用任何形式的认证，所有请求全部走 HTTP 到 apiserver。这是一个严重的问题，意味着所有 RBAC 策略全部失效，尤其实际生产环境是个很大的隐患，有单点失效，整个集群受控的风险。&lt;/p&gt;
+
+    &lt;p&gt;在这样的环境中，username 大部分为 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;system:unsecured&lt;/code&gt;&lt;/p&gt;
+
+    &lt;p&gt;&lt;a href=&quot;https://kubernetes.io/zh-cn/docs/reference/access-authn-authz/authentication/&quot;&gt;kubernetes官方手册-用户认证&lt;/a&gt;中讲述的非常详细，可以自行查看&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create Disallowed Pod&lt;/p&gt;
+
+    &lt;p&gt;创建不允许的 Pod。这个比较简单，有些场景下，直接创建后门的方式就是拉取一个后门 POD 下来，再做后面的逃逸（或者是直接拉下挖矿的 POD），在公司内部一般都有自己的容器镜像仓库（例如harbor），判断规则即&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code class=&quot;language-txt&quot;&gt; requestObject.pod.containers.image 域名解析，是否为本地仓库域名
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create Privileged Pod&lt;/p&gt;
+
+    &lt;p&gt;特权容器创建。这个老生常谈的话题了，特权容器下逃逸的方式太多了，挂载目录，加载内核模块等等。非常不幸运的是，在这里默认所有创建都是 privileged… 很痛苦，历史原因大致是因为，想要在容器内使用 systemd，privileged 最为方便，之前安全组的同学可能没有介入到容器安全部分，所以只能在后期推动改进…&lt;/p&gt;
+
+    &lt;p&gt;一看到这，还是很恐怖的。apiserver 未授权 + privileged 基本属于一个大型 shell 现场。只要一台机器被打穿，简简单单就能拿下大部分主机，这比早先还全是 KVM 的时候，刺激多了…&lt;/p&gt;
+
+    &lt;p&gt;攻击者可以通过 mount 文件系统浏览文件，或者通过 cgroup 去 exploit，具体的可以看一下 &lt;a href=&quot;https://github.com/cdk-team/CDK&quot;&gt;CDK&lt;/a&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create Sensitive Mount Pod&lt;/p&gt;
+
+    &lt;p&gt;挂载敏感目录。逃逸方式的一种，最简单的挂载 /etc/ 这种，有写权限的情况下，写入 ssh 公钥或者添加 cron 定时任务。当然这个其实也需要过滤，有些特殊的 pod 例如 net-exporter 这种，就是需要挂载 /sys 下一些敏感目录，与使用的同学沟通好及时维护白名单即可&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create HostNetwork Pod&lt;/p&gt;
+
+    &lt;p&gt;创建了 hostNetwork: true 配置的 POD。这会允许当前的 POD 使用当前 Node 节点的 namespace。那么这个 POD 可以访问 Node 上所有的网络，常见的就是后门 POD，启动的时候把 HostNetwork，HostPID都设置为 true，然后 command、args 反弹 shell&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create HostPid Pod&lt;/p&gt;
+
+    &lt;p&gt;创建了 hostPid: true 的 POD。如果只是开启一个 hostPid 的话，大概率不能 root。这个&lt;a href=&quot;https://bishopfox.com/blog/kubernetes-pod-privilege-escalation#Pod2&quot;&gt;文章&lt;/a&gt;写的很好，里面也有每个场景对应的 &lt;a href=&quot;https://github.com/BishopFox/badPods&quot;&gt;exploit-case&lt;/a&gt;，适合前期拿来做规则测试，讲述了每个权限开启的情况下，存在风险。通常情况下有后门的情况，和 privileged 一起用直接从 node 上反弹 shell&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create HostIPC Pod&lt;/p&gt;
+
+    &lt;p&gt;创建了 hostIPC: true 的 POD。可以查看一些进程间通信和共享内存的（&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipcs&lt;/code&gt; / &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/usr/bin/ipcs&lt;/code&gt;）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create NodePort Service&lt;/p&gt;
+
+    &lt;p&gt;一般情况下，默认 nodePort 范围是 30000-32767。配置 NodePort 之后可以从集群外部访问到该 service&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create/Modify Configmap With Private Credentials&lt;/p&gt;
+
+    &lt;p&gt;这个的问题在于使用不当，&lt;a href=&quot;https://kubernetes.io/zh-cn/docs/concepts/configuration/configmap/&quot;&gt;Kubernetes-官方文档&lt;/a&gt;中很明确的指出了 configmap 只是存非机密数据的，如果是机密的请使用 secret… 规则内容也很简单，就是对 configmap 做增改操作的时候，正则匹配一下configmap的key的名称对比一下。&lt;/p&gt;
+
+    &lt;p&gt;falco 自带的估计…不适合所有人，主要是 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aws access key&lt;/code&gt; 和 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;password&lt;/code&gt; 关键字，需要自己修改一下匹配列表，做个适应&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Anonymous Request Allowed&lt;/p&gt;
+
+    &lt;p&gt;拒绝匿名请求，做好 RBAC 从你我做起&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Attach/Exec Pod&lt;/p&gt;
+
+    &lt;p&gt;pod 的 subresource 是 exec 或者 attach 的，审计过滤一下 command 命令。例如有些时候运维同学做磁盘这些信息的采集，直接定时跑 df 这些，提前做好沟通，处理过滤掉。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;EphemeralContainers Created&lt;/p&gt;
+
+    &lt;p&gt;创建临时容器。暂时略过这个&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Create Disallowed Namespace&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Pod Created in Kube Namespace&lt;/p&gt;
+
+    &lt;p&gt;创建了例如 kube-system, kube-public namespace 的容器。具体的危害是啥？直接查阅 &lt;a href=&quot;https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/&quot;&gt;Kubernetes-官方文档&lt;/a&gt;，我引用一下&lt;/p&gt;
+
+    &lt;blockquote&gt;
+      &lt;p&gt;Components that create pods may also be unexpectedly powerful if they can do so inside namespaces like the kube-system namespace, because those pods can gain access to service account secrets or run with elevated permissions if those service accounts are granted access to permissive PodSecurityPolicies.&lt;/p&gt;
+    &lt;/blockquote&gt;
+
+    &lt;p&gt;另外一个 neargle 师傅的&lt;a href=&quot;https://weibo.com/ttarticle/p/show?id=2309404772135813120032&quot;&gt;文章&lt;/a&gt; 里也提及到了类似的问题&lt;/p&gt;
+
+    &lt;p&gt;路线即 kube-system -&amp;gt; 寻找该命名空间下的 service account -&amp;gt; Cluster Role(admin maybe)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Service Account Created in Kube Namespace&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;System ClusterRole Modified/Deleted&lt;/p&gt;
+
+    &lt;p&gt;参考一下&lt;a href=&quot;https://kubernetes.io/zh-cn/docs/reference/access-authn-authz/rbac/&quot;&gt;官方文档&lt;/a&gt;，基础的知识：Role 和 ClusterRole 都是权限累加的规则，只是作用范围不一样。一个是作用于 namespace 一个作用于 Cluster。本身创建可能是正常行为，但是需要 report 上来通知安全组&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Attach to cluster-admin Role&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;ClusterRole With Wildcard Created&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;ClusterRole With Write Privileges Created&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;ClusterRole With Pod Exec Created&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;K8s Secret Get Unsuccessfully Tried&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Untrusted Node Successfully Joined the Cluster&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Untrusted Node Unsuccessfully Tried to Join the Cluster&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Full K8s Administrative Access&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;下班了，回去在写&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>人机识别</title>
